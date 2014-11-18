@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>ExtJs下拉树</title>
+    <link href="http://cdn.bootcss.com/extjs/3.4.1-1/resources/css/ext-all.css" rel="stylesheet">
+</head>
+<body>
+<div id="form" style="margin: 10px">
+    <div>下拉树:<input type="text" id="comboBoxTree"></div>
+    <div style="margin-top: 100px;">参考：http://fernanda.blog.sohu.com/115647054.html</div>
+</div>
+<script src="http://cdn.bootcss.com/extjs/3.4.1-1/adapter/ext/ext-base.js"></script>
+<script src="http://cdn.bootcss.com/extjs/3.4.1-1/ext-all.js"></script>
+
+<script src="comboBoxTree.js"></script>
+<script type="text/javascript">
+    Ext.onReady(function() {
+        var treePanel = new Ext.tree.TreePanel({
+            rootVisible: false,
+            /* root: new Ext.tree.AsyncTreeNode({
+             id: 'tree',
+             text: '',
+             expanded: true,
+             loader: new Ext.tree.TreeLoader({
+             dataUrl: 'data.json'
+             })
+             })*/
+            root: new Ext.tree.AsyncTreeNode({
+                expanded: true,
+                children: [{
+                    text: 'Menu Option 1',
+                    leaf: false,
+                    /*expanded: true,*/
+                    children: [{
+                        text: 'Child 1-1',
+                        leaf: true
+                    }, {
+                        text: 'Child 1-2',
+                        leaf: true
+                    }, {
+                        text: 'Child 1-3',
+                        leaf: true
+                    }]
+                }, {
+                    text: 'Menu Option 2',
+                    leaf: false,
+                    /*expanded: true,*/
+                    children: [{
+                        text: 'Child 2-1',
+                        leaf: true
+                    }, {
+                        text: 'Child 2-2',
+                        leaf: true
+                    }, {
+                        text: 'Child 2-3',
+                        leaf: true
+                    }]
+                }, {
+                    text: 'Menu Option 3',
+                    leaf: false,
+                    /*expanded: true,*/
+                    children: [{
+                        text: 'Child 3-1',
+                        leaf: true
+                    }, {
+                        text: 'Child 3-2',
+                        leaf: true
+                    }, {
+                        text: 'Child 3-3',
+                        leaf: true
+                    }]
+                }]
+            })
+        });
+
+        treePanel.on('load', function (node, checked) {
+            node.expand();
+            node.eachChild(function (child) {
+                child.expand();
+            });
+        }, treePanel);
+
+        var contenttreecombo = new Ext.form.ComboBoxTree({
+            fieldLabel : '下拉树',
+            width : 230,
+            allowBlank : false,
+            autoHeight : true,
+            emptyText : '请选择...',
+            passName : 'treecombo',
+            // allowUnLeafClick:false,//只允许选择叶子
+            treeHeight : 200,
+            tree : treePanel
+        });
+
+        var comboBoxTree = new Ext.form.ComboBoxTree({
+            id: "comboBoxTree",
+            applyTo: "comboBoxTree",
+            fieldLabel: '下拉树',
+            width: 230,
+            allowBlank: false,
+            autoHeight: true,
+            passName: 'treecombo',
+            // allowUnLeafClick:false,//只允许选择叶子
+            treeHeight: 200,
+            tree: treePanel
+        });
+    });
+</script>
+</body>
+</html>

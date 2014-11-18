@@ -1,0 +1,24 @@
+{
+  "root": [
+    {
+      "VALUE": 1,
+      "TEXT": "Father1",
+      "PID":"-1"
+    },
+    {
+      "VALUE": 11,
+      "TEXT": "child 1-1",
+      "PID":"1"
+    },
+    {
+      "VALUE": 2,
+      "TEXT": "Father2",
+      "PID":"-1"
+    },
+    {
+      "VALUE": 3,
+      "TEXT": "Father3",
+      "PID":"-1"
+    }
+  ]
+}

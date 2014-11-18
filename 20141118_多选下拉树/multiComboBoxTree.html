@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>ExtJs多选下拉树</title>
+    <link href="http://cdn.bootcss.com/extjs/3.4.1-1/resources/css/ext-all.css" rel="stylesheet">
+</head>
+<body>
+<div id="form" style="margin: 10px">
+    <div>下拉树:<input type="text" id="multiComboBoxTree"></div>
+    <div style="margin-top: 100px;">参考：http://blog.csdn.net/hahadekuai/article/details/7769093</div>
+</div>
+
+<script src="http://cdn.bootcss.com/extjs/3.4.1-1/adapter/ext/ext-base.js"></script>
+<script src="http://cdn.bootcss.com/extjs/3.4.1-1/ext-all.js"></script>
+
+<script src="multiComboBoxTree.js"></script>
+<script type="text/javascript">
+    Ext.onReady(function(){
+        var multiComboBoxTre = new Ext.form.MultiComboBoxTree({
+            id: "multiComboBoxTree",
+            applyTo: "multiComboBoxTree",
+            mode: "local",
+            fieldLabel: "多选下拉",
+            hiddenName: "mutliselect",
+            name: "mutliselect",
+            url: "data.json",
+            //typeAhead     : true,
+            selectNodeModel: "all",
+            displayField: "TEXT",
+            valueField: "VALUE",
+            parentField: "PID",
+            rootValue: -1,
+            dataRoot: "root",
+            //value         : 0,
+            width: 220,
+            resizable: true,
+            value: "11,3", //默认值
+            store: new Ext.data.JsonStore({
+                autoLoad: true,
+                url: "data.json",
+                root: "root",
+                fields: [
+                    {name: "TEXT"},
+                    {name: "VALUE"},
+                    {name: "PID"}
+                ]
+            })
+        });
+    });
+</script>
+</body>
+</html>
