@@ -209,6 +209,7 @@ Ext.form.MultiComboBoxTree = Ext.extend( Ext.form.ComboBox, {
             var item = data[i];
             item["text"]=item[d];
             item["id"]=item[v];
+            item.leaf = true;
             item.checked = false;
             if(item[p]==s){
                 r.push(item);
