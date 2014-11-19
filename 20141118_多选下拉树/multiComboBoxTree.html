@@ -8,6 +8,7 @@
 <body>
 <div id="form" style="margin: 10px">
     <div>多选下拉树:<input type="text" id="multiComboBoxTree"></div>
+    <div>单选下拉树:<input type="text" id="singleComboBoxTree"><input type="button"  id="getSingleVal" value="获取单选下拉框值"></div>
     <div style="margin-top: 100px;">参考：http://blog.csdn.net/hahadekuai/article/details/7769093</div>
 </div>
 
@@ -16,8 +17,8 @@
 
 <script src="multiComboBoxTree.js"></script>
 <script type="text/javascript">
-    Ext.onReady(function(){
-        var multiComboBoxTre = new Ext.form.MultiComboBoxTree({
+    Ext.onReady(function () {
+        var multiComboBoxTree = new Ext.form.MultiComboBoxTree({
             id: "multiComboBoxTree",
             applyTo: "multiComboBoxTree",
             mode: "local",
@@ -26,7 +27,7 @@
             name: "mutliselect",
             url: "data.json",
             //typeAhead     : true,
-            selectNodeModel: "all",
+            selectNodeModel: "leaf",
             displayField: "TEXT",
             valueField: "VALUE",
             parentField: "PID",
@@ -35,7 +36,7 @@
             //value         : 0,
             width: 220,
             resizable: true,
-            value: "11,3", //默认值
+            // value: "11,3", //默认值
             store: new Ext.data.JsonStore({
                 autoLoad: true,
                 url: "data.json",
@@ -46,6 +47,43 @@
                     {name: "PID"}
                 ]
             })
+        });
+
+        var singleComboBoxTree = new Ext.form.MultiComboBoxTree({
+            id: "singleComboBoxTree",
+            applyTo: "singleComboBoxTree",
+            isMulti: false,
+            mode: "local",
+            fieldLabel: "单选下拉",
+            hiddenName: "mutliselect",
+            name: "singleselect",
+            url: "data.json",
+            //typeAhead     : true,
+            selectNodeModel: "leaf",
+            displayField: "TEXT",
+            valueField: "VALUE",
+            parentField: "PID",
+            rootValue: -1,
+            dataRoot: "root",
+            //value         : 0,
+            width: 220,
+            resizable: true,
+            // value: "11,3", //默认值
+            store: new Ext.data.JsonStore({
+                autoLoad: true,
+                url: "data.json",
+                root: "root",
+                fields: [
+                    {name: "TEXT"},
+                    {name: "VALUE"},
+                    {name: "PID"}
+                ]
+            })
+        });
+
+        Ext.get("getSingleVal").on("click",function(){
+            console.log(singleComboBoxTree);
+            alert(singleComboBoxTree.getValue());
         });
     });
 </script>

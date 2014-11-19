@@ -7,7 +7,7 @@
  * @license     MIT License
  */
 if ('function' !== typeof RegExp.escape) {
-    RegExp.escape = function(s) {
+    RegExp.escape = function (s) {
         if ('string' !== typeof s) {
             return s
         }
@@ -15,17 +15,18 @@ if ('function' !== typeof RegExp.escape) {
     }
 }
 
-Ext.form.MultiComboBoxTree = Ext.extend( Ext.form.ComboBox, {
-    checkField      : 'checked',
-    displayField    : "TEXT",
-    valueField      : "VALUE",
-    parentField     : "PARENTID",
-    dataRoot        : "root",
-    separator       : ",",
-    rootText        : "主菜单",
-    rootValue       : -1,
-    rootVisible     : false,
-    triggerAction   : "all",
+Ext.form.MultiComboBoxTree = Ext.extend(Ext.form.ComboBox, {
+    isMulti: true,//是否多选
+    checkField: 'checked',
+    displayField: "TEXT",
+    valueField: "VALUE",
+    parentField: "PARENTID",
+    dataRoot: "root",
+    separator: ",",
+    rootText: "主菜单",
+    rootValue: -1,
+    rootVisible: false,
+    triggerAction: "all",
     //lazyInit      : false,
     /** @selectNodeModel
      * all : 所有结点都可选中
@@ -33,119 +34,130 @@ Ext.form.MultiComboBoxTree = Ext.extend( Ext.form.ComboBox, {
      * folder : 只有目录（非叶子和非根结点）可选
      * leaf ：只有叶子结点可选
      */
-    selectNodeModel : 'all',
-    mode            : "local",
-    editable        : false,
-    emptyText       : '请选择...',
-    constructor : function(){
+    selectNodeModel: 'all',
+    mode: "local",
+    editable: false,
+    emptyText: '请选择...',
+    /**
+     * 初始化
+     */
+    constructor: function () {
         Ext.form.MultiComboBoxTree.superclass.constructor.apply(this, arguments);
         this.maxHeight = this.maxHeight || this.height;
-        if(!this.store){
+        if (!this.store) {
             this.store = new Ext.data.JsonStore({
-                autoLoad    : true,
-                url         : this.url,
-                root        : this.dataRoot,
-                fields      : [
-                    {name : this.displayField},
-                    {name : this.valueField},
-                    {name : this.parentField}
+                autoLoad: true,
+                url: this.url,
+                root: this.dataRoot,
+                fields: [
+                    {name: this.displayField},
+                    {name: this.valueField},
+                    {name: this.parentField}
                 ]
             });
         }
         this.store.on({
-            scope : this,
-            load : function(store){
-                this.getValue()&&this.setValue(this.getValue());
-                if(this.tree){
+            scope: this,
+            load: function (store) {
+                this.getValue() && this.setValue(this.getValue());
+                if (this.tree) {
                     this.loadData();
                 }
             }
         })
     },
-    initList : function(){
-        if(!this.list){
+    /**
+     *
+     */
+    initList: function () {
+        if (!this.list) {
             var cls = 'x-combo-list';
 
             this.list = new Ext.Layer({
-                parentEl    : this.getListParent(),
-                shadow      : this.shadow,
-                cls         : [cls, this.listClass].join(' '),
-                constrain   : false
+                parentEl: this.getListParent(),
+                shadow: this.shadow,
+                cls: [cls, this.listClass].join(' '),
+                constrain: false
             });
 
             var lw = this.listWidth || Math.max(this.wrap.getWidth(), this.minListWidth);
             this.list.setSize(lw, 0);
             this.assetHeight = 0;
-            if(this.syncFont !== false){
+            if (this.syncFont !== false) {
                 this.list.setStyle('font-size', this.el.getStyle('font-size'));
             }
 
-            this.innerList = this.list.createChild({cls:cls+'-inner'});
+            this.innerList = this.list.createChild({cls: cls + '-inner'});
             this.innerList.setWidth(lw - this.list.getFrameWidth('lr'));
 
-            if(!this.tree){
+            if (!this.tree) {
                 this.tree = new Ext.tree.TreePanel({
-                    root    : new Ext.tree.TreeNode({
-                        text    : this.rootText,
-                        id      : this.rootValue,
+                    root: new Ext.tree.TreeNode({
+                        text: this.rootText,
+                        id: this.rootValue,
                         expanded: true
                     }),
-                    selectNodeModel : this.selectNodeModel,
-                    border          : false,
-                    rootVisible     : this.rootVisible,
-                    autoHeight      : true,
-                    renderTo        : this.innerList
+                    selectNodeModel: this.selectNodeModel,
+                    border: false,
+                    rootVisible: this.rootVisible,
+                    autoHeight: true,
+                    renderTo: this.innerList
                 });
 
                 this.tree.on({
-                    scope : this,
-                    checkchange : this.onCheckChange,
-                    expandnode : function(nodep){
+                    scope: this,
+                    click: this.onTextClick,
+                    checkchange: this.onCheckChange,
+                    expandnode: function (nodep) {
                         this.tree.suspendEvents();
                         var values = this.getCheckedValue().split(this.separator);
-                        nodep.cascade(function(node){
+                        nodep.cascade(function (node) {
                             node.getUI().toggleCheck(false);
-                            node.attributes.checked=false;
-                            for(var i = 0 ; i < values.length;i++){
-                                if("" + node.attributes[this.valueField] === values[i]){
+                            node.attributes.checked = false;
+                            for (var i = 0; i < values.length; i++) {
+                                if ("" + node.attributes[this.valueField] === values[i]) {
                                     node.getUI().toggleCheck(true);
-                                    node.attributes.checked=true;
+                                    node.attributes.checked = true;
                                     break;
                                 }
                             }
-                        },this);
+                        }, this);
                         this.tree.resumeEvents();
                         this.restrictHeight();
                     },
-
                     // 取消双击事件
-                    beforedblclick  : function(){
+                    beforedblclick: function () {
                         return false;
                     }
-                })
-                if(this.store.getCount()>0){
+                });
+                if (this.store.getCount() > 0) {
                     this.loadData();
                 }
             }
 
-            if(this.resizable){
-                this.resizer = new Ext.Resizable(this.list,{
-                    pinned : true,
-                    handles:'se'
+            if (this.resizable) {
+                this.resizer = new Ext.Resizable(this.list, {
+                    pinned: true,
+                    handles: 'se'
                 });
-                this.mon(this.resizer, 'resize', function(r, w, h){
-                    this.maxHeight = h-this.handleHeight-this.list.getFrameWidth('tb')-this.assetHeight;
+                this.mon(this.resizer, 'resize', function (r, w, h) {
+                    this.maxHeight = h - this.handleHeight - this.list.getFrameWidth('tb') - this.assetHeight;
                     this.listWidth = w;
                     this.innerList.setWidth(w - this.list.getFrameWidth('lr'));
                     this.restrictHeight();
                 }, this);
 
-                this[this.pageSize?'footer':'innerList'].setStyle('margin-bottom', this.handleHeight+'px');
+                this[this.pageSize ? 'footer' : 'innerList'].setStyle('margin-bottom', this.handleHeight + 'px');
             }
         }
     },
-
-    onCheckChange : function(node,checked) {
+    /**
+     * 选中事件
+     * @param node
+     * @param checked
+     * @param selectForm
+     */
+    onSelectChange: function (node, checked, selectForm) {
         var isRoot = (node == this.tree.getRootNode());
         var selModel = this.selectNodeModel;
         var isLeaf = node.isLeaf();
@@ -156,14 +168,42 @@ Ext.form.MultiComboBoxTree = Ext.extend( Ext.form.ComboBox, {
         } else if (selModel == 'leaf' && !isLeaf) {
             return;
         }
-        var r = this.findRecord(this.valueField, node.attributes[this.valueField]);
-        if(r){
-            r["data"][this.checkField] = checked;
+
+        if (this.isMulti) {
+            var r = this.findRecord(this.valueField, node.attributes[this.valueField]);
+            if (r) {
+                if (checked == null || typeof(checked) == 'object') {
+                    checked = r["data"][this.checkField] ? !r["data"][this.checkField] : true;
+                }
+                r["data"][this.checkField] = checked;
+            }
+            this.setValue(this.getCheckedValue());
+            if (selectForm.toLowerCase() == "click") {
+                node.getUI().toggleCheck(checked);
+            }
+        } else {
+            this.setValue(node.attributes[this.valueField]);// 设置option值
+            this.collapse();// 隐藏option列表
         }
-        this.setValue(this.getCheckedValue());
+    },
+    /**
+     * text单击事件
+     * @param node
+     * @param checked
+     */
+    onTextClick: function (node, e) {
+        this.onSelectChange(node, null, "click");
+    },
+    /**
+     * checkbox单击事件
+     * @param node
+     * @param checked
+     */
+    onCheckChange: function (node, checked) {
+        this.onSelectChange(node, checked, "checkChange");
     },
 
-    expand: function() {
+    expand: function () {
         if (this.isExpanded() || !this.hasFocus) {
             return;
         }
@@ -187,107 +227,113 @@ Ext.form.MultiComboBoxTree = Ext.extend( Ext.form.ComboBox, {
         this.fireEvent('expand', this);
     },
 
-    loadData : function(){
+    loadData: function () {
         var data = [];
-        this.store.each(function(item,index){
+        this.store.each(function (item, index) {
             /**此处进行数据复制*/
-            data.push(Ext.apply({},item.data));
-        },this);
+            data.push(Ext.apply({}, item.data));
+        }, this);
         var treedata = this.formatData(data);
         this.tree.getRootNode().appendChild(treedata);
         this.tree.getRootNode().expandChildNodes();
     },
 
-    formatData : function (data){
+    formatData: function (data) {
         var len = data.length;
         var r = [], b = {},
             p = this.parentField,
             v = this.valueField,
             d = this.displayField,
             s = this.rootValue;
-        for(var i = 0; i < len; i ++){
+        for (var i = 0; i < len; i++) {
             var item = data[i];
-            item["text"]=item[d];
-            item["id"]=item[v];
+            item["text"] = item[d];
+            item["id"] = item[v];
             item.leaf = true;
-            item.checked = false;
-            if(item[p]==s){
+            this.formatDataChecked(item, false);//item.checked = false;
+            if (item[p] == s) {
                 r.push(item);
                 continue;
             }
-            if(!b["_"+item[p]]){
-                for(var a = 0 ; a < len; a++){
+            if (!b["_" + item[p]]) {
+                for (var a = 0; a < len; a++) {
                     var t = data[a];
-                    if(item[p]==t[v]){
-                        if(t[p]==s&&!b["_"+t[v]]){
-                            b["_"+t[v]] = t;
-                            b["_"+t[v]].leaf = false;
+                    if (item[p] == t[v]) {
+                        if (t[p] == s && !b["_" + t[v]]) {
+                            b["_" + t[v]] = t;
+                            b["_" + t[v]].leaf = false;
                         }
-                        if(!t["children"])t["children"]=[];
+                        if (!t["children"])t["children"] = [];
                         t.leaf = false;
                         t["children"].push(item);
                         item.leaf = true;
-                        item.checked = false;
+                        this.formatDataChecked(item, false);//item.checked = false;
                         break;
                     }
                 }
                 continue;
             }
-            if(!b["_"+item[p]]["children"]){
-                b["_"+item[p]]["children"] = [];
-                b["_"+item[p]].leaf = false;
+            if (!b["_" + item[p]]["children"]) {
+                b["_" + item[p]]["children"] = [];
+                b["_" + item[p]].leaf = false;
             }
             item.leaf = true;
-            item.checked = false;
-            b["_"+item[p]]["children"].push(item);
+            this.formatDataChecked(item, false);//item.checked = false;
+            b["_" + item[p]]["children"].push(item);
             continue;
         }
         return  r;
     },
 
-    clearValue: function() {
+    formatDataChecked: function (item, checked) {
+        if (this.isMulti) {
+            item.checked = checked || false;
+        }
+    },
+
+    clearValue: function () {
         this.value = '';
         this.setRawValue(this.value);
         var root = this.tree.getRootNode();
-        root.cascade(function(node){
+        root.cascade(function (node) {
             if (node.attributes.checked) {
                 node.getUI().toggleCheck(false);
-                node.attributes.checked=false;
+                node.attributes.checked = false;
             }
-        },this)
-        if(this.hiddenField) {
+        }, this)
+        if (this.hiddenField) {
             this.hiddenField.value = ''
         }
         this.applyEmptyText()
     },
 
-    getCheckedDisplay: function() {
+    getCheckedDisplay: function () {
         var re = new RegExp(this.separator, "g");
         return this.getCheckedValue(this.displayField).replace(re, this.separator + ' ')
     },
-    getCheckedValue: function(field) {
+    getCheckedValue: function (field) {
         field = field || this.valueField;
         var c = [];
         var snapshot = this.store.snapshot || this.store.data;
-        snapshot.each(function(r) {
+        snapshot.each(function (r) {
             if (r.get(this.checkField)) {
                 c.push(r.get(field))
             }
-        },this);
+        }, this);
         return c.join(this.separator)
     },
 
-    setValue: function(v) {
+    setValue: function (v) {
         if (typeof v != 'undefined') {
             v = '' + v;
-            this.value =  v;
+            this.value = v;
             this.store.clearFilter();
-            this.store.each(function(r) {
+            this.store.each(function (r) {
                 var checked = !(!v.match('(^|' + this.separator + ')' + RegExp.escape(r.get(this.valueField)) + '(' + this.separator + '|$)'));
                 r.set(this.checkField, checked);
                 //if(checked)console.log(r);
-            },this);
-            this.setRawValue(this.store.getCount()>0 ? this.getCheckedDisplay() : this.value);
+            }, this);
+            this.setRawValue(this.store.getCount() > 0 ? this.getCheckedDisplay() : this.value);
             if (this.hiddenField) {
                 this.hiddenField.value = this.value
             }
@@ -299,14 +345,14 @@ Ext.form.MultiComboBoxTree = Ext.extend( Ext.form.ComboBox, {
         }
     },
 
-    getValue: function() {
+    getValue: function () {
         return typeof this.value != 'undefined' ? this.value : '';
     },
 
-    onSelect : Ext.emptyFn,
-    select : Ext.emptyFn,
-    onViewOver : Ext.emptyFn,
-    onViewClick : Ext.emptyFn,
-    assertValue : Ext.emptyFn,
-    beforeBlur : Ext.emptyFn
+    onSelect: Ext.emptyFn,
+    select: Ext.emptyFn,
+    onViewOver: Ext.emptyFn,
+    onViewClick: Ext.emptyFn,
+    assertValue: Ext.emptyFn,
+    beforeBlur: Ext.emptyFn
 });
