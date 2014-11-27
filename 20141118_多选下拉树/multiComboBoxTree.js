@@ -38,6 +38,8 @@ Ext.form.MultiComboBoxTree = Ext.extend(Ext.form.ComboBox, {
     mode: "local",
     editable: false,
     emptyText: '请选择...',
+    callback: null,
+    expandAllChildNodes: false,         //false展开以及节点，true展开所有节点
     /**
      * 初始化
      */
@@ -185,6 +187,10 @@ Ext.form.MultiComboBoxTree = Ext.extend(Ext.form.ComboBox, {
             this.setValue(node.attributes[this.valueField]);// 设置option值
             this.collapse();// 隐藏option列表
         }
+
+        if (this.callback) {
+            this.callback.call(this, node);
+        }
     },
     /**
      * text单击事件
@@ -235,7 +241,7 @@ Ext.form.MultiComboBoxTree = Ext.extend(Ext.form.ComboBox, {
         }, this);
         var treedata = this.formatData(data);
         this.tree.getRootNode().appendChild(treedata);
-        this.tree.getRootNode().expandChildNodes();
+        this.tree.getRootNode().expandChildNodes(this.expandAllChildNodes);
     },
 
     formatData: function (data) {
@@ -282,7 +288,7 @@ Ext.form.MultiComboBoxTree = Ext.extend(Ext.form.ComboBox, {
             b["_" + item[p]]["children"].push(item);
             continue;
         }
-        return  r;
+        return r;
     },
 
     formatDataChecked: function (item, checked) {

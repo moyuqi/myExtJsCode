@@ -8,7 +8,7 @@
 <body>
 <div id="form" style="margin: 10px">
     <div>多选下拉树:<input type="text" id="multiComboBoxTree"></div>
-    <div>单选下拉树:<input type="text" id="singleComboBoxTree"><input type="button"  id="getSingleVal" value="获取单选下拉框值"></div>
+    <div>单选下拉树:<input type="text" id="singleComboBoxTree"><input type="button" id="getSingleVal" value="获取单选下拉框值"></div>
     <div style="margin-top: 100px;">参考：http://blog.csdn.net/hahadekuai/article/details/7769093</div>
 </div>
 
@@ -78,10 +78,15 @@
                     {name: "VALUE"},
                     {name: "PID"}
                 ]
-            })
+            }),
+            callback: function (node) {
+                console.log(node);
+                console.log(this.getValue());
+            },
+            expandAllChildNodes: true
         });
 
-        Ext.get("getSingleVal").on("click",function(){
+        Ext.get("getSingleVal").on("click", function () {
             console.log(singleComboBoxTree);
             alert(singleComboBoxTree.getValue());
         });
